@@ -129,7 +129,7 @@ OBJSC = ${FILES:.c=.o}
 OBJSCXX = ${OBJSC:.cxx=.o}
 OBJS = ${OBJSCXX:.f=.o}
 
-SONAME = libHYPRE_mli-${HYPRE_RELEASE_VERSION}.so
+SONAME = libHYPRE_mli-${HYPRE_RELEASE_VERSION}${HYPRE_LIB_SUFFIX}
 
 ##################################################################
 # Targets
@@ -152,14 +152,15 @@ distclean: clean
 # Rules
 ##################################################################
 
-libHYPRE_mli.a: ${OBJS}
+libHYPRE_mli${HYPRE_LIB_SUFFIX}: ${OBJS}
 	@echo  "Building $@ ... "
-	${AR} $@ ${OBJS}
-	${RANLIB} $@
-
-libHYPRE_mli.so: ${OBJS}
-	@echo  "Building $@ ... "
+ifdef BUILD_CC_SHARED
 	${BUILD_CC_SHARED} -o ${SONAME} ${OBJS} ${SHARED_SET_SONAME}${SONAME}
 	ln -s ${SONAME} $@
+else
+	${AR} $@ ${OBJS}
+	${RANLIB} $@
+endif
+
 
 ${OBJS}: ${HEADERS}

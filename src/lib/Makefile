@@ -57,7 +57,7 @@ $(UTILITIESFILES)\
 $(BLASFILES)\
 $(LAPACKFILES)
 
-SONAME = libHYPRE-${HYPRE_RELEASE_VERSION}.so
+SONAME = libHYPRE-${HYPRE_RELEASE_VERSION}${HYPRE_LIB_SUFFIX}
 SOLIBS = ${MPILIBDIRS} ${MPILIBS} ${LAPACKLIBDIRS} ${LAPACKLIBS}\
  ${BLASLIBDIRS} ${BLASLIBS} ${LIBS} ${FLIBS}
 
@@ -82,8 +82,12 @@ distclean: clean
 # Rules
 ##################################################################
 
-libHYPRE.a: ${FILES_HYPRE}
-	@echo  "Building libHYPRE ... "
+libHYPRE${HYPRE_LIB_SUFFIX}: ${FILES_HYPRE}
+	@echo  "Building $@ ... "
+ifdef BUILD_CC_SHARED
+	${BUILD_CC_SHARED} -o ${SONAME} ${FILES_HYPRE} ${SOLIBS} ${SHARED_SET_SONAME}${SONAME} ${SHARED_OPTIONS} ${LDFLAGS}
+	ln -s ${SONAME} $@
+else
 	${AR} $@ $(FEIHYPREFILES) $(FEMLIFILES) $(IJMVFILES)
 	${AR} $@ $(EUCLIDFILES)
 	${AR} $@ $(PARASAILSFILES)
@@ -102,8 +106,4 @@ libHYPRE.a: ${FILES_HYPRE}
 	${AR} $@ $(STRUCTMVFILES)
 	${AR} $@ $(UTILITIESFILES) $(BLASFILES) $(LAPACKFILES)
 	${RANLIB} $@
-
-libHYPRE.so: ${FILES_HYPRE}
-	@echo  "Building $@ ... "
-	${BUILD_CC_SHARED} -o ${SONAME} ${FILES_HYPRE} ${SOLIBS} ${SHARED_SET_SONAME}${SONAME} ${SHARED_OPTIONS} ${LDFLAGS}
-	ln -s ${SONAME} $@
+endif

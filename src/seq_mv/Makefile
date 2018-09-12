@@ -50,7 +50,7 @@ FILES =\
 OBJS = ${FILES:.c=.o}
 CUOBJS = ${FILES_NVCC:.cu=.o}
 
-SONAME = libHYPRE_seq_mv-${HYPRE_RELEASE_VERSION}.so
+SONAME = libHYPRE_seq_mv-${HYPRE_RELEASE_VERSION}${HYPRE_LIB_SUFFIX}
 
 ##################################################################
 # Targets
@@ -76,14 +76,14 @@ distclean: clean
 # Rules
 ##################################################################
 
-libHYPRE_seq_mv.a: ${OBJS} ${CUOBJS}
+libHYPRE_seq_mv${HYPRE_LIB_SUFFIX}: ${OBJS} ${CUOBJS}
 	@echo  "Building $@ ... "
-	${AR} $@ ${OBJS}
-	${RANLIB} $@
-
-libHYPRE_seq_mv.so: ${OBJS} ${CUOBJS}
-	@echo  "Building $@ ... "
+ifdef BUILD_CC_SHARED
 	${BUILD_CC_SHARED} -o ${SONAME} ${OBJS} ${SHARED_SET_SONAME}${SONAME}
 	ln -s ${SONAME} $@
+else
+	${AR} $@ ${OBJS}
+	${RANLIB} $@
+endif
 
 ${OBJS}: ${HEADERS}

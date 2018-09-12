@@ -111,7 +111,7 @@ FILES =\
 
 OBJS = ${FILES:.c=.o}
 
-SONAME = libHYPRE_sstruct_ls-${HYPRE_RELEASE_VERSION}.so
+SONAME = libHYPRE_sstruct_ls-${HYPRE_RELEASE_VERSION}${HYPRE_LIB_SUFFIX}
 
 ##################################################################
 # Targets
@@ -137,14 +137,14 @@ distclean: clean
 # Rules
 ##################################################################
 
-libHYPRE_sstruct_ls.a: ${OBJS}
+libHYPRE_sstruct_ls${HYPRE_LIB_SUFFIX}: ${OBJS}
 	@echo  "Building $@ ... "
-	${AR} $@ ${OBJS}
-	${RANLIB} $@
-
-libHYPRE_sstruct_ls.so: ${OBJS}
-	@echo  "Building $@ ... "
+ifdef BUILD_CC_SHARED
 	${BUILD_CC_SHARED} -o ${SONAME} ${OBJS} ${SHARED_SET_SONAME}${SONAME}
 	ln -s ${SONAME} $@
+else
+	${AR} $@ ${OBJS}
+	${RANLIB} $@
+endif
 
 ${OBJS}: ${HEADERS}
